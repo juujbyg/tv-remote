@@ -1,7 +1,7 @@
 // Renders every IR code to audio, then demodulates it like a TV's IR receiver would and checks
-// that the pulse train and the decoded bits match. Run: node test/ir.test.mjs
+// that the pulse train and the decoded bits match. Run: node experimental/infrared/ir.test.mjs
 import assert from 'node:assert/strict';
-import { PRESETS, signalFor, render, parsePronto } from '../public/ir.js';
+import { PRESETS, signalFor, render, parsePronto } from './ir.js';
 
 const RATE = 48000;
 

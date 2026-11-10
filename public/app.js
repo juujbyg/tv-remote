@@ -1,5 +1,3 @@
-import * as IR from './ir.js';
-
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
@@ -8,24 +6,8 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
 };
 
-const state = { tvs: [], current: store.get('currentTv', null), brands: [], irTvs: store.get('irTvs', []) };
+const state = { tvs: [], current: store.get('currentTv', null), brands: [] };
 const currentTv = () => state.tvs.find((t) => t.id === state.current);
-
-// Infrared TVs live only on this phone (no server needed).
-const irAsTv = (t) => ({ ...t, brand: 'ir', ir: true, paired: true, ip: 'infrared', brandLabel: `Infrared · ${IR.PRESETS[t.preset]?.label || 'custom codes'}` });
-const saveIr = () => store.set('irTvs', state.irTvs);
-
-async function irPress(tv, key) {
-  if (key === 'power_on') key = 'power';
-  let signal;
-  try { signal = IR.signalFor(tv.preset, key, tv.overrides || {}); }
-  catch (e) { return toast(`Bad custom code for ${key}: ${e.message}`, true); }
-  if (!signal) return toast(`No IR code for “${key.replace(/_/g, ' ')}” in this code set. Add one under Custom IR codes.`, true);
-  const btn = $('#tvPicker');
-  btn.classList.remove('ir-tx'); void btn.offsetWidth; btn.classList.add('ir-tx');
-  try { await IR.transmit(signal); setDot('ready'); }
-  catch (e) { setDot('err'); toast(`Audio output failed: ${e.message}`, true); }
-}
 
 const PAIR_HINT = {
   samsung: 'Look at your TV and choose <b>Allow</b> when it asks about “Phone Remote”.',
@@ -67,7 +49,6 @@ async function press(key) {
   const tv = currentTv();
   if (!tv) { openSheet('sheetTvs'); return; }
   buzz();
-  if (tv.ir) return irPress(tv, key);
   inflight++; if (inflight === 1) setDot('busy');
   try {
     await api(`tvs/${tv.id}/key`, { key });
@@ -112,7 +93,6 @@ for (const el of $$('[data-app]')) {
   el.addEventListener('click', async () => {
     const tv = currentTv();
     if (!tv) return openSheet('sheetTvs');
-    if (tv.ir) return toast('App shortcuts need a Wi-Fi TV', true);
     buzz();
     try { await api(`tvs/${tv.id}/app`, { app: el.dataset.app }); toast(`Opening ${el.textContent}…`); }
     catch (e) { toast(e.message, true); }
@@ -196,7 +176,7 @@ function renderTvList() {
         <svg class="ic"><use href="#i-tv"/></svg>
         <span class="meta"><b>${esc(t.name)}</b><small>${esc(t.brandLabel)} · ${esc(t.ip)}${t.paired ? '' : ' · not connected'}</small></span>
       </button>
-      ${t.ir ? `<button class="small-btn" data-codes="${t.id}">Codes</button>` : t.paired ? '' : `<button class="small-btn" data-pair="${t.id}">Connect</button>`}
+      ${t.paired ? '' : `<button class="small-btn" data-pair="${t.id}">Connect</button>`}
       <button class="icon-btn" data-del="${t.id}" aria-label="Remove ${esc(t.name)}"><svg class="ic sm"><use href="#i-trash"/></svg></button>
     </li>`).join('');
   $$('[data-pick]', list).forEach((b) => b.addEventListener('click', () => {
@@ -208,12 +188,10 @@ function renderTvList() {
   $$('[data-del]', list).forEach((b) => b.addEventListener('click', async () => {
     const tv = state.tvs.find((t) => t.id === b.dataset.del);
     if (!confirm(`Remove ${tv.name}?`)) return;
-    if (tv.ir) { state.irTvs = state.irTvs.filter((t) => t.id !== tv.id); saveIr(); }
-    else await api(`tvs/${tv.id}`, null, 'DELETE');
+    await api(`tvs/${tv.id}`, null, 'DELETE');
     await loadTvs();
     renderTvList();
   }));
-  $$('[data-codes]', list).forEach((b) => b.addEventListener('click', () => openIrCodes(b.dataset.codes)));
 }
 
 function selectTv(id) { state.current = id; store.set('currentTv', id); renderHeader(); }
@@ -221,7 +199,7 @@ function selectTv(id) { state.current = id; store.set('currentTv', id); renderHe
 async function loadTvs() {
   let wifi = [];
   try { wifi = await api('tvs'); state.online = true; } catch { state.online = false; }
-  state.tvs = [...wifi, ...state.irTvs.map(irAsTv)];
+  state.tvs = wifi;
   if (!currentTv()) state.current = state.tvs[0]?.id ?? null;
   store.set('currentTv', state.current);
   renderHeader();
@@ -331,82 +309,11 @@ $('#codeForm').addEventListener('submit', async (e) => {
 $('#pskForm').addEventListener('submit', (e) => { e.preventDefault(); startPair(currentTv(), { psk: $('#pskInput').value.trim() }); });
 $('#pairRetry').addEventListener('click', () => startPair(currentTv()));
 
-// ---------- infrared setup ----------
-const irForm = $('#irForm');
-irForm.preset.innerHTML = Object.entries(IR.PRESETS).map(([id, p]) => `<option value="${id}">${esc(p.label)}</option>`).join('')
-  + '<option value="custom">Other (paste your own codes)</option>';
-
-irForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const preset = irForm.preset.value;
-  const label = IR.PRESETS[preset]?.label || 'IR';
-  const tv = { id: `ir${Date.now().toString(36)}`, name: irForm.name.value.trim() || `${label} TV (IR)`, preset, overrides: {} };
-  state.irTvs.push(tv); saveIr();
-  await loadTvs();
-  selectTv(tv.id);
-  irForm.reset();
-  if (preset === 'custom') openIrCodes(tv.id);
-  else { closeSheets(); toast('IR TV added. Volume to max and point the LEDs at the TV.'); }
-});
-
-// Power-code search: step through every brand's power signal until the TV reacts.
-let searchIdx = 0;
-function showSearch() {
-  const id = IR.POWER_SEARCH[searchIdx];
-  $('#irSearchStep').textContent = `Code ${searchIdx + 1} of ${IR.POWER_SEARCH.length}`;
-  $('#irSearchName').textContent = IR.PRESETS[id].label;
-}
-async function sendSearch() {
-  buzz();
-  try { await IR.transmit(IR.signalFor(IR.POWER_SEARCH[searchIdx], 'power')); }
-  catch (e) { toast(`Audio output failed: ${e.message}`, true); }
-}
-$('#irSearchBtn').addEventListener('click', () => { searchIdx = 0; openSheet('sheetIrSearch'); showSearch(); sendSearch(); });
-$('#irSearchSend').addEventListener('click', sendSearch);
-$('#irSearchNext').addEventListener('click', () => {
-  searchIdx = (searchIdx + 1) % IR.POWER_SEARCH.length;
-  if (searchIdx === 0) toast('Tried them all. Starting over. Not found? Pick “Other” and paste codes.', true);
-  showSearch(); sendSearch();
-});
-$('#irSearchOk').addEventListener('click', () => {
-  openSheet('sheetTvs');
-  $('#irSection').open = true;
-  irForm.preset.value = IR.POWER_SEARCH[searchIdx];
-  irForm.name.focus();
-  toast(`Found it: ${IR.PRESETS[IR.POWER_SEARCH[searchIdx]].label}`);
-});
-
-// Custom Pronto codes per button ("key = code" lines).
-let editingIr = null;
-function openIrCodes(id) {
-  editingIr = state.irTvs.find((t) => t.id === id);
-  if (!editingIr) return;
-  $('#irCodes').value = Object.entries(editingIr.overrides || {}).map(([k, v]) => `${k} = ${v}`).join('\n');
-  openSheet('sheetIrCodes');
-}
-$('#irCodesForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const overrides = {}, bad = [];
-  for (const line of $('#irCodes').value.split('\n')) {
-    if (!line.trim()) continue;
-    const m = line.match(/^\s*([a-z_0-9]+)\s*[=:]\s*(.+)$/i);
-    if (!m) { bad.push(line.trim().slice(0, 20)); continue; }
-    try { IR.parsePronto(m[2]); overrides[m[1].toLowerCase()] = m[2].trim(); }
-    catch { bad.push(m[1]); }
-  }
-  if (bad.length) return toast(`Could not read: ${bad.join(', ')}`, true);
-  editingIr.overrides = overrides; saveIr();
-  await loadTvs();
-  closeSheets();
-  toast(`Saved ${Object.keys(overrides).length} custom code(s)`);
-});
-
 // ---------- text ----------
 $('#textForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const tv = currentTv(), input = $('#textInput');
   if (!tv || !input.value) return;
-  if (tv.ir) return toast('Typing needs a Wi-Fi TV. Use the number pad or arrows instead.', true);
   try { await api(`tvs/${tv.id}/text`, { text: input.value }); toast('Sent'); input.value = ''; }
   catch (err) { toast(err.message, true); }
 });
@@ -422,7 +329,7 @@ $('#textForm').addEventListener('submit', async (e) => {
     form.brand.innerHTML = info.brands.map((b) => `<option value="${b.id}">${esc(b.label)}</option>`).join('');
     syncPskField();
   } catch {
-    toast('Wi-Fi TV service is not running. Infrared TVs still work.', true);
+    toast('The TV service is not running.', true);
   }
   await loadTvs();
   if (!state.tvs.length && (matchMedia('(pointer: coarse)').matches || innerWidth < 600)) openSheet('sheetTvs');

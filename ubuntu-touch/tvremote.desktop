@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=TV Remote
-Comment=Control your TV over Wi-Fi or infrared
+Comment=Control your smart TV over Wi-Fi
 Exec=bin/node app/launcher.mjs
 Icon=icon.svg
 Terminal=false

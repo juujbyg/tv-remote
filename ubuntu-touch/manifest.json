@@ -1,11 +1,11 @@
 {
-  "name": "tvremote.local",
+  "name": "tvremote.juujbyg",
   "title": "TV Remote",
-  "description": "Remote for smart TVs over Wi-Fi, and for any TV over infrared with an LED in the headphone jack",
-  "version": "1.0.4",
+  "description": "Remote control for smart TVs over Wi-Fi: Android TV / Google TV, Samsung, LG webOS, Roku and Sony Bravia",
+  "version": "1.1.0",
   "architecture": "arm64",
   "framework": "ubuntu-touch-24.04-1.x",
-  "maintainer": "TV Remote <tvremote@localhost>",
+  "maintainer": "juujbyg <147175691+juujbyg@users.noreply.github.com>",
   "hooks": {
     "tvremote": {
       "apparmor": "tvremote.apparmor",

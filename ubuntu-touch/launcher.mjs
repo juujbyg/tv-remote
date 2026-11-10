@@ -6,7 +6,7 @@ import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 
-const APP_ID = 'tvremote.local';
+const APP_ID = 'tvremote.juujbyg';
 const PORT = 18787;
 process.env.DATA_DIR = path.join(os.homedir(), '.local/share', APP_ID);
 process.env.HOST = '127.0.0.1';

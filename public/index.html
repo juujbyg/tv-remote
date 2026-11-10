@@ -154,51 +154,6 @@
       </form>
       <p class="muted small">Find the IP on your TV under Settings → Network → Status, or in your router's device list.</p>
     </details>
-
-    <details class="manual" id="irSection">
-      <summary>Infrared TV (LED in the headphone jack)</summary>
-      <div class="ir-help">
-        <p class="small">For TVs without Wi-Fi. Take two IR LEDs (old remotes have them) and connect them <b>in opposite directions</b> between the <b>left</b> and <b>right</b> contacts of a headphone plug. The ground contact stays unused.</p>
-        <svg class="wiring" viewBox="0 0 300 110" role="img" aria-label="Schematic: headphone left and right contacts joined by two IR LEDs facing opposite directions">
-          <text x="6" y="24" class="w-t">L (tip)</text><text x="6" y="94" class="w-t">R (ring)</text>
-          <circle cx="70" cy="20" r="4" class="w-dot"/><circle cx="70" cy="90" r="4" class="w-dot"/>
-          <path d="M70 20H210M70 90H210M130 20v22M130 62v28M210 90V68M210 48V20" class="w-wire" fill="none"/>
-          <path d="M118 42h24l-12 20z" class="w-led"/><path d="M118 62h24" class="w-wire"/>
-          <path d="M198 68h24l-12-20z" class="w-led"/><path d="M198 48h24" class="w-wire"/>
-          <path d="M146 46l10-6m-6 0h6v6M146 56l10-6m-6 0h6v6M226 52l10-6m-6 0h6v6M226 62l10-6m-6 0h6v6" class="w-ray" fill="none"/>
-          <text x="246" y="58" class="w-t">IR light</text>
-        </svg>
-        <p class="small muted">Turn the phone's <b>media volume to maximum</b>, then point the LEDs at the TV from close range (1–2 m).</p>
-      </div>
-      <form id="irForm" autocomplete="off">
-        <label>Brand / code set <select name="preset" id="irPreset"></select></label>
-        <button type="button" class="secondary wide" id="irSearchBtn">Don't know? Find the code that works</button>
-        <label>Name <input name="name" placeholder="Bedroom TV"></label>
-        <button class="primary wide" type="submit">Add IR TV</button>
-      </form>
-    </details>
-  </section>
-
-  <section class="sheet" id="sheetIrSearch" hidden aria-label="Find IR code">
-    <div class="grab"></div>
-    <header><h2>Find your TV's code</h2><button class="icon-btn" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button></header>
-    <p class="muted small">Point the LEDs at the TV. Each step sends a <b>power</b> signal. When the TV switches off (or on), tap “That worked”.</p>
-    <div class="search-now"><small id="irSearchStep"></small><b id="irSearchName"></b></div>
-    <div class="row">
-      <button class="secondary" id="irSearchSend" style="flex:1">Send again</button>
-      <button class="secondary" id="irSearchNext" style="flex:1">Next code</button>
-    </div>
-    <button class="primary wide" id="irSearchOk" style="margin-top:10px">That worked</button>
-  </section>
-
-  <section class="sheet" id="sheetIrCodes" hidden aria-label="Custom IR codes">
-    <div class="grab"></div>
-    <header><h2>Custom IR codes</h2><button class="icon-btn" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button></header>
-    <p class="muted small">Paste Pronto hex codes for any button, one per line as <code>button = code</code>. Search the web for “<i>your TV model</i> pronto hex”. Buttons: power, vol_up, vol_down, mute, ch_up, ch_down, up, down, left, right, ok, back, home, menu, input, num_0…num_9, play_pause, stop…</p>
-    <form id="irCodesForm">
-      <textarea id="irCodes" rows="8" spellcheck="false" placeholder="power = 0000 006D 0022 0002 0157 00AC 0015 ..."></textarea>
-      <button class="primary wide" type="submit">Save codes</button>
-    </form>
   </section>
 
   <section class="sheet" id="sheetPair" hidden aria-label="Connect to TV">

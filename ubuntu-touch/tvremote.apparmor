@@ -1,5 +1,5 @@
 {
   "template": "ubuntu-webapp",
-  "policy_groups": ["networking", "audio", "webview"],
+  "policy_groups": ["networking", "webview"],
   "policy_version": 2404.1
 }

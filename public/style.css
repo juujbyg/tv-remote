@@ -242,25 +242,6 @@ form input:focus, form select:focus { border-color: var(--accent); }
 .toast.err { border-color: #ff4d4f88; }
 .link { color: var(--accent); text-decoration: none; font-weight: 600; }
 
-/* ---------- infrared ---------- */
-.ir-help p { margin: 10px 0; color: #c3c7cf; }
-.wiring { display: block; width: 100%; max-width: 320px; margin: 6px auto; }
-.w-wire { stroke: var(--muted); stroke-width: 2; fill: none; }
-.w-dot { fill: var(--text); }
-.w-led { fill: var(--accent); stroke: var(--accent); stroke-width: 1.5; stroke-linejoin: round; }
-.w-ray { stroke: var(--accent); stroke-width: 1.5; stroke-linecap: round; }
-.w-t { fill: var(--text); font-size: 12px; font-weight: 600; }
-textarea {
-  width: 100%; margin: 8px 0 12px; padding: 12px; border-radius: 12px; resize: vertical;
-  background: var(--bg); border: 1px solid var(--line); color: var(--text); font: 13px/1.4 ui-monospace, Consolas, monospace; outline: none;
-}
-textarea:focus { border-color: var(--accent); }
-.search-now { margin: 16px 0; padding: 16px; border-radius: 14px; background: var(--body-2); border: 1px solid var(--line); text-align: center; }
-.search-now small { display: block; color: var(--muted); }
-.search-now b { font-size: 20px; }
-.ir-tx { animation: irflash .25s; }
-@keyframes irflash { 50% { box-shadow: 0 0 0 6px #ff8a3d55; } }
-
 /* ---------- compact phones (e.g. 360×720 CSS px) ---------- */
 .utility .pill { min-width: 0; padding: 0 10px; gap: 6px; overflow: hidden; }
 .utility .pill span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

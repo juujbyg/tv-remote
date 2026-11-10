@@ -14,6 +14,7 @@ mkdir -p "$STAGE/pkg/app" "$STAGE/pkg/bin"
 cp ubuntu-touch/manifest.json ubuntu-touch/tvremote.apparmor ubuntu-touch/tvremote.desktop "$STAGE/pkg/"
 cp ubuntu-touch/launcher.mjs "$STAGE/pkg/app/launcher.mjs"
 cp public/icon.svg "$STAGE/pkg/icon.svg"
+cp LICENSE "$STAGE/pkg/LICENSE"
 cp -r server.js package.json drivers lib public node_modules "$STAGE/pkg/app/"
 cp "$NODE_ARM64/bin/node" "$STAGE/pkg/bin/node"
 cp "$NODE_ARM64/LICENSE" "$STAGE/pkg/bin/NODE-LICENSE"
@@ -26,3 +27,9 @@ chmod +x "$STAGE/pkg/bin/node"
 "$ADB" push ubuntu-touch/install-click.py /home/phablet/tvremote-build/install-click.py
 "$ADB" shell 'cd /home/phablet/tvremote-build && tar -xzf pkg.tgz && chmod +x pkg/bin/node \
   && click build pkg && python3 install-click.py "$(ls -1t /home/phablet/tvremote-build/*.click | head -1)"'
+
+# Keep a copy of the package (the file to upload to the OpenStore).
+CLICK=$("$ADB" shell 'ls -1t /home/phablet/tvremote-build/*.click | head -1' | tr -d '\r')
+mkdir -p dist
+"$ADB" pull "$CLICK" "dist/$(basename "$CLICK")"
+echo "Package: dist/$(basename "$CLICK")"

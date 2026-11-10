@@ -1,5 +1,6 @@
 // Phone TV Remote bridge: serves the phone web app and relays button presses to TVs on the LAN.
 import http from 'node:http';
+import net from 'node:net';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -83,14 +84,14 @@ const routes = [
 
   ['POST', /^\/api\/probe$/, async (req) => {
     const { ip } = await body(req);
-    if (!/^[\w.:-]+$/.test(ip || '')) throw httpError(400, 'Enter a valid IP address');
+    if (!net.isIP(ip || '')) throw httpError(400, 'Enter a valid IP address');
     return probe(ip);
   }],
 
   ['POST', /^\/api\/tvs$/, async (req) => {
     const { ip, brand, name, psk, mac } = await body(req);
     if (!DRIVERS[brand]) throw httpError(400, 'Pick a TV type');
-    if (brand !== 'demo' && !/^[\w.:-]+$/.test(ip || '')) throw httpError(400, 'Enter a valid IP address');
+    if (brand !== 'demo' && !net.isIP(ip || '')) throw httpError(400, 'Enter a valid IP address');
     const tv = { id: randomUUID().slice(0, 8), brand, ip: brand === 'demo' ? '127.0.0.1' : ip, name: (name || '').trim() || `${DRIVERS[brand].label} ${ip || ''}`.trim(), psk, mac, paired: false };
     tvs.push(tv); save();
     return publicTv(tv);
@@ -160,6 +161,23 @@ const routes = [
   }],
 ];
 
+/**
+ * Only answer requests meant for this service: the Host must be an IP or localhost (a DNS-rebinding
+ * page would carry its own domain name), and API calls from a browser must come from this origin,
+ * so other websites open on the phone cannot press keys or scan the network.
+ */
+function trusted(req) {
+  const host = req.headers.host || '';
+  let hostname;
+  try { hostname = new URL(`http://${host}`).hostname.replace(/^\[|\]$/g, ''); } catch { return false; }
+  if (hostname !== 'localhost' && !net.isIP(hostname)) return false;
+  const origin = req.headers.origin;
+  if (origin && origin !== 'null') {
+    try { if (new URL(origin).host !== host) return false; } catch { return false; }
+  } else if (origin === 'null') return false;
+  return true;
+}
+
 function httpError(status, message) { return Object.assign(new Error(message), { status }); }
 function findTv(id) {
   const tv = tvs.find((t) => t.id === id);
@@ -192,6 +210,7 @@ async function serveStatic(req, res) {
 
 const server = http.createServer(async (req, res) => {
   const { pathname } = new URL(req.url, 'http://x');
+  if (!trusted(req)) return send(res, 403, { error: 'Forbidden' });
   if (!pathname.startsWith('/api/')) return serveStatic(req, res);
   for (const [method, re, handler] of routes) {
     const m = pathname.match(re);
