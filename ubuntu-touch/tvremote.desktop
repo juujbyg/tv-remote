@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=TV Remote
+Comment=Control your TV over Wi-Fi or infrared
+Exec=bin/node app/launcher.mjs
+Icon=icon.svg
+Terminal=false
+Type=Application
+X-Lomiri-Touch=true
+X-Lomiri-Splash-Color=#0b0c0e

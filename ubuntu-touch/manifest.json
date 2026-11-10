@@ -1,0 +1,15 @@
+{
+  "name": "tvremote.local",
+  "title": "TV Remote",
+  "description": "Remote for smart TVs over Wi-Fi, and for any TV over infrared with an LED in the headphone jack",
+  "version": "1.0.4",
+  "architecture": "arm64",
+  "framework": "ubuntu-touch-24.04-1.x",
+  "maintainer": "TV Remote <tvremote@localhost>",
+  "hooks": {
+    "tvremote": {
+      "apparmor": "tvremote.apparmor",
+      "desktop": "tvremote.desktop"
+    }
+  }
+}

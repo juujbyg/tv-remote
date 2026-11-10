@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test TV</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+  :root { --accent: #ff8a3d; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: #050506; color: #eceef2; font: 16px/1.4 system-ui, "Segoe UI", sans-serif; display: grid; place-items: center; }
+  .bezel { width: min(96vw, 1100px); aspect-ratio: 16/9; background: #000; border: 14px solid #141518; border-radius: 18px; box-shadow: 0 30px 90px #000; position: relative; overflow: hidden; }
+  .screen { position: absolute; inset: 0; padding: 4% 5%; background: radial-gradient(120% 90% at 20% 0%, #1f2a44, #0b0f1a 70%); transition: opacity .4s, filter .4s; }
+  .screen.off { opacity: 0; }
+  h1 { margin: 0 0 3%; font-size: clamp(16px, 2.4vw, 28px); font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2.2%; }
+  .tile { aspect-ratio: 16/10; border-radius: 10px; background: #ffffff12; display: grid; place-items: center; font-weight: 700; font-size: clamp(10px, 1.4vw, 16px); transition: transform .15s, box-shadow .15s, background .15s; }
+  .tile.focus { transform: scale(1.08); box-shadow: 0 0 0 3px var(--accent), 0 10px 30px #000a; background: #ffffff22; }
+  .tile.hit { background: var(--accent); color: #1a0e05; }
+  .osd { position: absolute; right: 4%; top: 6%; padding: 10px 16px; border-radius: 12px; background: #000c; font-weight: 700; opacity: 0; transition: opacity .2s; }
+  .osd.show { opacity: 1; }
+  .vol { position: absolute; left: 4%; bottom: 8%; width: 30%; opacity: 0; transition: opacity .2s; }
+  .vol.show { opacity: 1; }
+  .vol .bar { height: 8px; border-radius: 4px; background: #ffffff22; overflow: hidden; margin-top: 6px; }
+  .vol .fill { height: 100%; background: var(--accent); transition: width .1s; }
+  .typed { position: absolute; left: 5%; right: 5%; bottom: 6%; padding: 12px 16px; border-radius: 10px; background: #ffffff14; font-size: clamp(14px, 1.8vw, 20px); min-height: 1em; }
+  .typed:empty { display: none; }
+  .log { margin-top: 18px; color: #8b909b; font-size: 13px; text-align: center; min-height: 1.4em; }
+  .standby { position: absolute; inset: 0; display: grid; place-items: center; color: #444; font-size: 14px; pointer-events: none; }
+</style>
+</head>
+<body>
+<div>
+  <div class="bezel">
+    <div class="standby">Standby. Press power on the remote.</div>
+    <div class="screen" id="screen">
+      <h1 id="title">Home</h1>
+      <div class="grid" id="grid"></div>
+      <div class="typed" id="typed"></div>
+    </div>
+    <div class="osd" id="osd"></div>
+    <div class="vol" id="vol">Volume <span id="volN">20</span><div class="bar"><div class="fill" id="volFill" style="width:20%"></div></div></div>
+  </div>
+  <div class="log" id="log">Waiting for the remote… (add “Test TV” in the app)</div>
+</div>
+<script>
+  const names = ['Live TV','Netflix','YouTube','Prime Video','Disney+','Music','Photos','Games','Settings','Weather','News','Sports','Kids','Movies','Search'];
+  const grid = document.getElementById('grid');
+  grid.innerHTML = names.map((n) => `<div class="tile">${n}</div>`).join('');
+  const tiles = [...grid.children];
+  let focus = 0, vol = 20, muted = false, ch = 1, on = true, osdTimer, volTimer;
+  const $ = (id) => document.getElementById(id);
+  function paint() { tiles.forEach((t, i) => t.classList.toggle('focus', i === focus)); }
+  function osd(text) { const o = $('osd'); o.textContent = text; o.classList.add('show'); clearTimeout(osdTimer); osdTimer = setTimeout(() => o.classList.remove('show'), 1400); }
+  function showVol() { $('volN').textContent = muted ? 'muted' : vol; $('volFill').style.width = (muted ? 0 : vol) + '%'; $('vol').classList.add('show'); clearTimeout(volTimer); volTimer = setTimeout(() => $('vol').classList.remove('show'), 1500); }
+  function setPower(v) { on = v; $('screen').classList.toggle('off', !on); }
+  function handle({ type, value }) {
+    $('log').textContent = `${new Date().toLocaleTimeString()} · ${type}: ${value}`;
+    if (type === 'key' && (value === 'power' || value === 'power_off')) return setPower(value === 'power' ? !on : false);
+    if (!on) { if (type === 'key' && value === 'power_on') setPower(true); return; }
+    if (type === 'text') { $('typed').textContent += value; return; }
+    if (type === 'app') { $('title').textContent = value[0].toUpperCase() + value.slice(1); osd('Opening ' + value); return; }
+    const k = value;
+    if (k === 'right') focus = Math.min(tiles.length - 1, focus + 1);
+    else if (k === 'left') focus = Math.max(0, focus - 1);
+    else if (k === 'down') focus = Math.min(tiles.length - 1, focus + 5);
+    else if (k === 'up') focus = Math.max(0, focus - 5);
+    else if (k === 'ok') { const t = tiles[focus]; t.classList.add('hit'); setTimeout(() => t.classList.remove('hit'), 250); $('title').textContent = t.textContent; }
+    else if (k === 'home') { $('title').textContent = 'Home'; focus = 0; $('typed').textContent = ''; }
+    else if (k === 'back') $('title').textContent = 'Home';
+    else if (k === 'backspace') $('typed').textContent = $('typed').textContent.slice(0, -1);
+    else if (k === 'vol_up') { vol = Math.min(100, vol + 2); muted = false; showVol(); }
+    else if (k === 'vol_down') { vol = Math.max(0, vol - 2); showVol(); }
+    else if (k === 'mute') { muted = !muted; showVol(); }
+    else if (k === 'ch_up') osd('CH ' + (++ch));
+    else if (k === 'ch_down') osd('CH ' + (ch = Math.max(1, ch - 1)));
+    else if (k.startsWith('num_')) osd('CH ' + (ch = Number(k.slice(4)) || ch));
+    else osd(k.replace(/_/g, ' ').toUpperCase());
+    paint();
+  }
+  paint();
+  const es = new EventSource('api/demo/events');
+  es.onmessage = (e) => handle(JSON.parse(e.data));
+</script>
+</body>
+</html>

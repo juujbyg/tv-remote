@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#101114">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Remote">
+  <title>TV Remote</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v8M6.6 6.6a7.5 7.5 0 1 0 10.8 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-back" viewBox="0 0 24 24"><path d="M9 7 4 12l5 5M4.5 12H15a5 5 0 0 1 0 10h-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 -3)"/></symbol>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7M6.5 9.5V20h11V9.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9.5l5 5m0-5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-playpause" viewBox="0 0 24 24"><path d="M4 6v12l8-6zM15 6v12M20 6v12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-rew" viewBox="0 0 24 24"><path d="M11 6 3 12l8 6zM21 6l-8 6 8 6z" fill="currentColor"/></symbol>
+      <symbol id="i-ffwd" viewBox="0 0 24 24"><path d="m13 6 8 6-8 6zM3 6l8 6-8 6z" fill="currentColor"/></symbol>
+      <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></symbol>
+      <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 10h1m3 0h1m3 0h1m3 0h1M6 14h1m3 0h4m3 0h1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-numpad" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="6" cy="5" r="1.7"/><circle cx="12" cy="5" r="1.7"/><circle cx="18" cy="5" r="1.7"/><circle cx="6" cy="11" r="1.7"/><circle cx="12" cy="11" r="1.7"/><circle cx="18" cy="11" r="1.7"/><circle cx="6" cy="17" r="1.7"/><circle cx="12" cy="17" r="1.7"/><circle cx="18" cy="17" r="1.7"/><circle cx="12" cy="22" r="1.4"/></g></symbol>
+      <symbol id="i-input" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v12m-3.5-3.5L12 20l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15 15 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-guide" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M9 9v11" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-tv" viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 20.5h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-down" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-backspace" viewBox="0 0 24 24"><path d="M8 5h12v14H8l-6-7zM12 9.5l5 5m0-5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="layout">
+    <main class="remote" id="remote">
+      <header class="top">
+        <button class="tv-picker" id="tvPicker" aria-label="Choose TV">
+          <span class="dot" id="statusDot"></span>
+          <span class="tv-name" id="tvName">Add a TV</span>
+          <svg class="ic sm"><use href="#i-down"/></svg>
+        </button>
+        <button class="btn power" data-key="power" aria-label="Power"><svg class="ic"><use href="#i-power"/></svg></button>
+      </header>
+
+      <div class="row utility">
+        <button class="btn pill" data-key="input" aria-label="Input / source"><svg class="ic"><use href="#i-input"/></svg><span>Input</span></button>
+        <button class="btn pill" data-key="settings" aria-label="Settings"><svg class="ic"><use href="#i-settings"/></svg><span>Settings</span></button>
+        <button class="btn pill" id="openText" aria-label="Keyboard"><svg class="ic"><use href="#i-keyboard"/></svg><span>Type</span></button>
+      </div>
+
+      <section class="nav-zone">
+        <div class="mode-toggle" role="tablist">
+          <button role="tab" class="on" data-mode="buttons">Arrows</button>
+          <button role="tab" data-mode="touch">Swipe</button>
+        </div>
+
+        <div class="dpad" id="dpad">
+          <button class="arrow up" data-key="up" data-repeat aria-label="Up"><svg class="ic"><use href="#i-chev"/></svg></button>
+          <button class="arrow right" data-key="right" data-repeat aria-label="Right"><svg class="ic"><use href="#i-chev"/></svg></button>
+          <button class="arrow down" data-key="down" data-repeat aria-label="Down"><svg class="ic"><use href="#i-chev"/></svg></button>
+          <button class="arrow left" data-key="left" data-repeat aria-label="Left"><svg class="ic"><use href="#i-chev"/></svg></button>
+          <button class="ok" data-key="ok" aria-label="OK">OK</button>
+        </div>
+
+        <div class="touchpad" id="touchpad" hidden>
+          <div class="touch-hint">Swipe to move · tap to select</div>
+          <div class="touch-ripple" id="ripple"></div>
+        </div>
+      </section>
+
+      <div class="row trio">
+        <button class="btn round" data-key="back" aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button>
+        <button class="btn round" data-key="home" aria-label="Home"><svg class="ic"><use href="#i-home"/></svg></button>
+        <button class="btn round" data-key="menu" aria-label="Menu"><svg class="ic"><use href="#i-menu"/></svg></button>
+      </div>
+
+      <div class="rockers">
+        <div class="rocker">
+          <button data-key="vol_up" data-repeat aria-label="Volume up">+</button>
+          <span>VOL</span>
+          <button data-key="vol_down" data-repeat aria-label="Volume down">−</button>
+        </div>
+        <div class="mid">
+          <button class="btn round" data-key="mute" aria-label="Mute"><svg class="ic"><use href="#i-mute"/></svg></button>
+          <button class="btn round" id="openKeys" aria-label="Number pad"><svg class="ic"><use href="#i-numpad"/></svg></button>
+        </div>
+        <div class="rocker">
+          <button data-key="ch_up" data-repeat aria-label="Channel up"><svg class="ic sm"><use href="#i-chev"/></svg></button>
+          <span>CH</span>
+          <button data-key="ch_down" data-repeat aria-label="Channel down"><svg class="ic sm flip"><use href="#i-chev"/></svg></button>
+        </div>
+      </div>
+
+      <div class="row media">
+        <button class="btn flat" data-key="rewind" aria-label="Rewind"><svg class="ic"><use href="#i-rew"/></svg></button>
+        <button class="btn flat" data-key="play_pause" aria-label="Play / pause"><svg class="ic"><use href="#i-playpause"/></svg></button>
+        <button class="btn flat" data-key="stop" aria-label="Stop"><svg class="ic"><use href="#i-stop"/></svg></button>
+        <button class="btn flat" data-key="ffwd" aria-label="Fast forward"><svg class="ic"><use href="#i-ffwd"/></svg></button>
+      </div>
+
+      <div class="apps">
+        <button class="app" data-app="netflix">Netflix</button>
+        <button class="app" data-app="youtube">YouTube</button>
+        <button class="app" data-app="prime">Prime Video</button>
+        <button class="app" data-app="disney">Disney+</button>
+      </div>
+    </main>
+
+    <aside class="desk-panel" id="deskPanel">
+      <h2>Use it on your phone</h2>
+      <p>Connect your phone to the same Wi-Fi as this computer, then scan this code with the camera.</p>
+      <img id="qr" src="api/qr.svg" alt="QR code linking to the remote">
+      <code id="appUrl"></code>
+      <p class="muted">Then tap <b>Share → Add to Home Screen</b> (iPhone) or <b>⋮ → Add to Home screen</b> (Android) to install it as an app.</p>
+      <a class="link" href="tv.html" target="_blank">Open the test TV screen →</a>
+    </aside>
+  </div>
+
+  <!-- Sheets -->
+  <div class="scrim" id="scrim" hidden></div>
+
+  <section class="sheet" id="sheetTvs" hidden aria-label="Your TVs">
+    <div class="grab"></div>
+    <header><h2>Your TVs</h2><button class="icon-btn" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button></header>
+    <ul class="tv-list" id="tvList"></ul>
+
+    <h3>Add a TV</h3>
+    <button class="primary wide" id="scanBtn"><svg class="ic sm"><use href="#i-search"/></svg> Scan my network</button>
+    <ul class="tv-list found" id="foundList"></ul>
+
+    <details class="manual" id="manual">
+      <summary>Enter the TV's IP address</summary>
+      <form id="addForm" autocomplete="off">
+        <label>IP address
+          <div class="inline"><input name="ip" inputmode="decimal" placeholder="192.168.1.50"><button type="button" class="secondary" id="detectBtn">Detect</button></div>
+        </label>
+        <label>Type
+          <select name="brand" id="brandSelect"></select>
+        </label>
+        <label>Name <input name="name" placeholder="Living room TV"></label>
+        <label class="psk" hidden>Pre-Shared Key (2015+ models only) <input name="psk" placeholder="Leave empty for older Bravias"></label>
+        <button class="primary wide" type="submit">Add and connect</button>
+      </form>
+      <p class="muted small">Find the IP on your TV under Settings → Network → Status, or in your router's device list.</p>
+    </details>
+
+    <details class="manual" id="irSection">
+      <summary>Infrared TV (LED in the headphone jack)</summary>
+      <div class="ir-help">
+        <p class="small">For TVs without Wi-Fi. Take two IR LEDs (old remotes have them) and connect them <b>in opposite directions</b> between the <b>left</b> and <b>right</b> contacts of a headphone plug. The ground contact stays unused.</p>
+        <svg class="wiring" viewBox="0 0 300 110" role="img" aria-label="Schematic: headphone left and right contacts joined by two IR LEDs facing opposite directions">
+          <text x="6" y="24" class="w-t">L (tip)</text><text x="6" y="94" class="w-t">R (ring)</text>
+          <circle cx="70" cy="20" r="4" class="w-dot"/><circle cx="70" cy="90" r="4" class="w-dot"/>
+          <path d="M70 20H210M70 90H210M130 20v22M130 62v28M210 90V68M210 48V20" class="w-wire" fill="none"/>
+          <path d="M118 42h24l-12 20z" class="w-led"/><path d="M118 62h24" class="w-wire"/>
+          <path d="M198 68h24l-12-20z" class="w-led"/><path d="M198 48h24" class="w-wire"/>
+          <path d="M146 46l10-6m-6 0h6v6M146 56l10-6m-6 0h6v6M226 52l10-6m-6 0h6v6M226 62l10-6m-6 0h6v6" class="w-ray" fill="none"/>
+          <text x="246" y="58" class="w-t">IR light</text>
+        </svg>
+        <p class="small muted">Turn the phone's <b>media volume to maximum</b>, then point the LEDs at the TV from close range (1–2 m).</p>
+      </div>
+      <form id="irForm" autocomplete="off">
+        <label>Brand / code set <select name="preset" id="irPreset"></select></label>
+        <button type="button" class="secondary wide" id="irSearchBtn">Don't know? Find the code that works</button>
+        <label>Name <input name="name" placeholder="Bedroom TV"></label>
+        <button class="primary wide" type="submit">Add IR TV</button>
+      </form>
+    </details>
+  </section>
+
+  <section class="sheet" id="sheetIrSearch" hidden aria-label="Find IR code">
+    <div class="grab"></div>
+    <header><h2>Find your TV's code</h2><button class="icon-btn" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button></header>
+    <p class="muted small">Point the LEDs at the TV. Each step sends a <b>power</b> signal. When the TV switches off (or on), tap “That worked”.</p>
+    <div class="search-now"><small id="irSearchStep"></small><b id="irSearchName"></b></div>
+    <div class="row">
+      <button class="secondary" id="irSearchSend" style="flex:1">Send again</button>
+      <button class="secondary" id="irSearchNext" style="flex:1">Next code</button>
+    </div>
+    <button class="primary wide" id="irSearchOk" style="margin-top:10px">That worked</button>
+  </section>
+
+  <section class="sheet" id="sheetIrCodes" hidden aria-label="Custom IR codes">
+    <div class="grab"></div>
+    <header><h2>Custom IR codes</h2><button class="icon-btn" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button></header>
+    <p class="muted small">Paste Pronto hex codes for any button, one per line as <code>button = code</code>. Search the web for “<i>your TV model</i> pronto hex”. Buttons: power, vol_up, vol_down, mute, ch_up, ch_down, up, down, left, right, ok, back, home, menu, input, num_0…num_9, play_pause, stop…</p>
+    <form id="irCodesForm">
+      <textarea id="irCodes" rows="8" spellcheck="false" placeholder="power = 0000 006D 0022 0002 0157 00AC 0015 ..."></textarea>
+      <button class="primary wide" type="submit">Save codes</button>
+    </form>
+  </section>
+
+  <section class="sheet" id="sheetPair" hidden aria-label="Connect to TV">
+    <div class="grab"></div>
+    <header><h2 id="pairTitle">Connecting…</h2><button class="icon-btn" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button></header>
+    <div class="pair-body">
+      <div class="spinner" id="pairSpin"></div>
+      <p id="pairMsg"></p>
+      <form id="codeForm" hidden autocomplete="off">
+        <input id="codeInput" maxlength="6" placeholder="A1B2C3" autocapitalize="characters" spellcheck="false">
+        <button class="primary wide" type="submit">Pair</button>
+      </form>
+      <form id="pskForm" hidden autocomplete="off">
+        <input id="pskInput" placeholder="Pre-Shared Key">
+        <button class="primary wide" type="submit">Connect</button>
+      </form>
+      <button class="secondary wide" id="pairRetry" hidden>Try again</button>
+    </div>
+  </section>
+
+  <section class="sheet" id="sheetKeys" hidden aria-label="Number pad">
+    <div class="grab"></div>
+    <header><h2>Keypad</h2><button class="icon-btn" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button></header>
+    <div class="numpad">
+      <button data-key="num_1">1</button><button data-key="num_2">2</button><button data-key="num_3">3</button>
+      <button data-key="num_4">4</button><button data-key="num_5">5</button><button data-key="num_6">6</button>
+      <button data-key="num_7">7</button><button data-key="num_8">8</button><button data-key="num_9">9</button>
+      <button data-key="info" aria-label="Info"><svg class="ic sm"><use href="#i-info"/></svg></button>
+      <button data-key="num_0">0</button>
+      <button data-key="guide" aria-label="Guide"><svg class="ic sm"><use href="#i-guide"/></svg></button>
+    </div>
+    <div class="colors">
+      <button data-key="red" class="c-red" aria-label="Red"></button>
+      <button data-key="green" class="c-green" aria-label="Green"></button>
+      <button data-key="yellow" class="c-yellow" aria-label="Yellow"></button>
+      <button data-key="blue" class="c-blue" aria-label="Blue"></button>
+    </div>
+    <div class="row extras">
+      <button class="btn pill" data-key="power_on">Wake (power on)</button>
+      <button class="btn pill" data-key="search"><svg class="ic sm"><use href="#i-search"/></svg> Search</button>
+    </div>
+  </section>
+
+  <section class="sheet" id="sheetText" hidden aria-label="Type on TV">
+    <div class="grab"></div>
+    <header><h2>Type on TV</h2><button class="icon-btn" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button></header>
+    <p class="muted small">Open a search box on the TV first, then type here.</p>
+    <form id="textForm" autocomplete="off">
+      <input id="textInput" placeholder="Search for…" enterkeyhint="send">
+      <div class="row">
+        <button type="button" class="btn pill" data-key="backspace"><svg class="ic sm"><use href="#i-backspace"/></svg> Delete</button>
+        <button type="submit" class="primary">Send</button>
+      </div>
+    </form>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
