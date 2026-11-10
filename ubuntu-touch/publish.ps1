@@ -1,8 +1,10 @@
 # Publish TV Remote to the OpenStore (open-store.io).
 # Creates the app entry if it doesn't exist yet, uploads the newest dist\*.click as a new revision,
 # fills in the store page and publishes it. Run again after bumping the version to ship an update.
+# -PageOnly: only update the store page (text + screenshots), no new revision.
+# Screenshots: every ubuntu-touch\screenshots\*.png, in file-name order, replaces what the store has.
 # Your API key is on https://open-store.io/manage/profile (it is only sent to open-store.io).
-param([string]$Click, [string]$Changelog = 'Remote control for smart TVs over Wi-Fi.')
+param([string]$Click, [string]$Changelog = 'Remote control for smart TVs over Wi-Fi.', [switch]$PageOnly)
 $ErrorActionPreference = 'Stop'
 
 $id = 'tvremote.juujbyg'
@@ -11,8 +13,8 @@ $root = Split-Path $PSScriptRoot -Parent
 if (-not $Click) {
   $Click = Get-ChildItem "$root\dist\$($id)_*.click" | Sort-Object LastWriteTime | Select-Object -Last 1 -ExpandProperty FullName
 }
-if (-not $Click -or -not (Test-Path $Click)) { throw "No .click found in $root\dist. Build it first (ubuntu-touch/build.sh)." }
-$screenshot = "$root\dist\screenshot-1.png"
+if (-not $PageOnly -and (-not $Click -or -not (Test-Path $Click))) { throw "No .click found in $root\dist. Build it first (ubuntu-touch/build.sh)." }
+$screenshots = @(Get-ChildItem "$PSScriptRoot\screenshots\*.png" | Sort-Object Name | Select-Object -ExpandProperty FullName)
 
 $key = $env:OPENSTORE_API_KEY
 if (-not $key) { $key = Read-Host 'OpenStore API key (from https://open-store.io/manage/profile)' }
@@ -41,11 +43,13 @@ if (-not $app) {
     '--data-urlencode', 'source=https://github.com/juujbyg/tv-remote')
 }
 
-Write-Host "Uploading $(Split-Path $Click -Leaf) (automated review runs now, this can take a minute)..."
-$null = Invoke-Store 'Upload revision' @('-X', 'POST', "$api/$id/revision?apikey=$key",
-  '-F', "file=@$Click",
-  '--form-string', 'channel=focal',
-  '--form-string', "changelog=$Changelog")
+if (-not $PageOnly) {
+  Write-Host "Uploading $(Split-Path $Click -Leaf) (automated review runs now, this can take a minute)..."
+  $null = Invoke-Store 'Upload revision' @('-X', 'POST', "$api/$id/revision?apikey=$key",
+    '-F', "file=@$Click",
+    '--form-string', 'channel=focal',
+    '--form-string', "changelog=$Changelog")
+}
 
 $description = @'
 Control your smart TV from your phone over Wi-Fi. No account, no cloud: the app talks to the TV directly on your local network.
@@ -67,11 +71,14 @@ $update = @('-X', 'PUT', "$api/$($id)?apikey=$key",
   '--form-string', 'category=Utilities',
   '--form-string', 'source=https://github.com/juujbyg/tv-remote',
   '--form-string', 'support_url=https://github.com/juujbyg/tv-remote/issues',
+  '--form-string', 'donate_url=https://buymeacoffee.com/juujbyg',
   '--form-string', 'license=MIT/X/Expat License',
   '--form-string', 'published=true')
-if ((-not $app.screenshots -or $app.screenshots.Count -eq 0) -and (Test-Path $screenshot)) {
-  $update += @('-F', "screenshot_files=@$screenshot;type=image/png")
-}
+# The store drops any screenshot not listed in 'screenshots' on every update, so clear the list and
+# re-upload ours in order (the store keeps at most 5).
+$update += @('--form-string', 'screenshots=[]')
+foreach ($shot in $screenshots | Select-Object -First 5) { $update += @('-F', "screenshot_files=@$shot;type=image/png") }
 $null = Invoke-Store 'Store page + publish' $update
 
+Write-Host "Screenshots: $($screenshots.Count)"
 Write-Host "`nPublished: https://open-store.io/app/$id"

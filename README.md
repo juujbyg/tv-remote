@@ -48,6 +48,10 @@ It builds with `click build` on the phone and installs through the system click 
 for each reinstall. The built `.click` is copied to `dist/` (that file is what goes to the OpenStore). To launch from adb, export `XDG_RUNTIME_DIR=/run/user/32011` first
 (otherwise the window can't reach the display server); tapping the icon needs nothing.
 
+## Support
+
+If the app is useful to you, you can [buy me a coffee](https://buymeacoffee.com/juujbyg).
+
 ## License
 
 MIT. The Ubuntu Touch package bundles the Node.js binary (MIT, its license ships as `bin/NODE-LICENSE`).
